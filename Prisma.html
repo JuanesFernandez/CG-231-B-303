@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ac>04/05>JuanFernandez</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+            #text {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                height: 100%;
+                text-align: left;
+                color: #ffffff;
+            } 
+    </style>
+  </head>
+  <body>
+  </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r94/three.min.js"></script>
+    <script type="module">
+        import { OrbitControls } from 'https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js';
+
+        //Camara
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);//Perspective camera
+        //               THREE.PerspectiveCamera(cono de vision, ancho / alto, limite z cerca, limite z lejos)
+        scene.add(camera);
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0xaaaaaa, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        camera.position.x = 10;
+        camera.position.y = 10;
+        camera.position.z = 10;
+        camera.lookAt(scene.position);
+
+        //Orbit Controls
+        var controls = new OrbitControls(camera, renderer.domElement);
+
+        //Cuadricula
+        const size = 150;
+        const divisions = 150;
+        const axesHelper = new THREE.AxesHelper(10);
+        scene.add(axesHelper);
+
+        const gridHelper = new THREE.GridHelper(size, divisions);
+        scene.add(gridHelper);
+
+        //Figura
+        
+        function Geometria(vx){
+            var geo = new THREE.Geometry();
+            var largoVertice = vx.length;
+            for (var i = 0; i < largoVertice; i++){
+            var [x,y,z]=[vx[i][0],vx[i][1],vx[i][2]]
+                var vector = new THREE.Vector3(x, y, z);
+                geo.vertices.push(vector);
+            }
+        return geo;
+        }
+
+        function Poligono(n,l){
+            const v=[];
+            const a = (2*Math.PI)/n;
+
+            for(let i=0; i<=n; i++){
+                let x = l*Math.cos(i*a);
+                let y = l*Math.sin(i*a);
+                //v[i] = new THREE.vector(x,y,0);
+                v[i] = [x,y,0];
+            }
+            return v;
+        }
+
+        //Geometria
+        const largo = 1;
+        const lados = 5;
+        const alto =3;
+
+        function prisma(lados, largo, alto){//por chatGPT
+        
+            const shape = new THREE.Shape();
+            const angle = (2 * Math.PI) / lados; // Ángulo entre cada vértice
+
+            // Definir los puntos del polígono
+            for (let i = 0; i < lados; i++) {
+                const x = largo * Math.cos(angle * i);
+                const y = largo * Math.sin(angle * i);
+                if (i === 0) {
+                    shape.moveTo(x, y);
+                } else {
+                    shape.lineTo(x, y);
+                }
+            }
+            shape.lineTo(largo, 0); // Cerrar el polígono
+
+            // Crear una instancia de la clase ExtrudeBufferGeometry y pasar la forma y las opciones de extrusión
+            const extrudeSettings = {
+                depth: alto,
+                bevelEnabled: false,
+            };
+            const geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+
+            // Crear una instancia de la clase Mesh y pasar la geometría y el material
+            const material = new THREE.MeshNormalMaterial();
+            const mesh = new THREE.Mesh(geometry, material);
+
+            mesh.rotation.x = -Math.PI/2;
+
+            // Añadir la malla a la escena
+            scene.add(mesh);
+        }
+
+        prisma(lados,largo,alto);
+
+        //Añadir a la escena
+        document.body.appendChild(renderer.domElement);
+        
+        function render() {
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+        }
+
+        render();
+
+		</script>
+	</body>
+</html>
